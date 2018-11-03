@@ -4,3 +4,6 @@ Lib/
 Scripts/
 pip-selfcheck.json
 pyvenv.cfg
+
+bin/
+.DS_Store

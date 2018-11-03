@@ -10,13 +10,14 @@ import heapq
 
 from collections import Counter
 
-stop_words = nltk.corpus.stopwords.words('english')
+stop_words = set(nltk.corpus.stopwords.words('english'))
+stop_words.add('figure')
 max_sentence_length = 30
-max_summary_sentences = 10
+max_summary_sentences = 3
 
 os.chdir('data')
 for text_file in glob.glob('*.txt'):
-    with open(text_file) as f:
+    with open(text_file, 'r', encoding='windows-1252') as f:
         # Read
         text = f.read()
         # Clean
@@ -28,7 +29,8 @@ for text_file in glob.glob('*.txt'):
         word_stream = re.sub(r'\d', ' ', word_stream)
         word_stream = re.sub(r'\s+', ' ', word_stream)
         # Count words
-        word_count = Counter(nltk.word_tokenize(word_stream))
+        word_stream = filter(lambda word: word not in stop_words, nltk.word_tokenize(word_stream))
+        word_count = Counter(word_stream)
         max_count = max(word_count.values())
         word_count = Counter({word: count / max_count for word, count in word_count.items()})
         # Rank sentences
@@ -46,4 +48,6 @@ for text_file in glob.glob('*.txt'):
         # Print top sentences
         summary_sentences = heapq.nlargest(
             max_summary_sentences, sentence_score, key=sentence_score.get)
+        print(f.name)
         print(' '.join(summary_sentences))
+        print()
